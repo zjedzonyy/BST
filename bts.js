@@ -73,6 +73,116 @@ const Tree = (array) => {
         prettyPrint(root);
     }
 
+    const find = (value) => {
+        const findValue = (node, value) => {
+            if (node === null) {
+                return null;
+            }
+
+            if (node.data === value) {
+                return node;
+            } 
+            
+            if (value < node.data) {
+                return findValue(node.left, value);
+            } else {
+                return findValue(node.right, value);
+            }
+        }
+
+        const result = findValue(root, value);
+        return result;
+
+    };
+
+    const levelOrder = (callback) => {
+        if (typeof callback !== "function") {
+            throw new Error ("A valid callback function is required!");
+        }
+        let q = [root];
+
+        while (q.length !== 0) {
+            // Use a callback function
+            callback(q[0]);
+
+            // Add children to q
+            if (q[0].left !== null) {
+                q.push(q[0].left);
+            }
+            if (q[0].right !== null) {
+                q.push(q[0].right);
+            }
+
+            // Remove current node from the q
+            q.shift()
+        }
+    };
+
+    const inOrder = (callback) => {
+        if (typeof callback !== "function") {
+            throw new Error ("A valid callback function is required!");
+        }
+
+        const traverse = (node) => {
+            if (node !== null) {
+                traverse(node.left);
+                callback(node);
+                traverse(node.right);
+            }
+        };
+
+        const result = traverse(root);
+    };
+
+    const preOrder = (callback) => {
+        if (typeof callback !== "function") {
+            throw new Error ("A valid callback function is required!");
+        }
+        const traverse = (node) => {
+            if (node !== null) {
+                callback(node);
+                traverse(node.left);
+                traverse(node.right);
+            }
+        };
+
+        const result = traverse(root);
+    };
+
+    const postOrder = (callback) => {
+        if (typeof callback !== "function") {
+            throw new Error ("A valid callback function is required!");
+        }
+
+        const traverse = (node) => {
+            if (node !== null) {
+                traverse(node.left);
+                traverse(node.right);
+                callback(node);
+            }
+        };
+
+        const result = traverse(root);
+    };
+
+    const height = (node) => {
+        if (node === null) {
+            return 0;
+        }
+        
+        return 1 + Math.max(height(node.left), height(node.right));
+    };
+
+    const depth = (node) => {
+        const height = height(root);
+        const heightNode = height(node);
+
+        const result = height - heightNode;
+        return result;
+       
+ 
+    }
+
     const prettyPrint = (node, prefix = "", isLeft = true) => {
         if (node === null) {
           return;
@@ -88,7 +198,7 @@ const Tree = (array) => {
 
     prettyPrint(root);
 
-    return { arr, root, insert, deleteItem };
+    return { arr, root, insert, deleteItem, find, levelOrder, inOrder, preOrder, postOrder, height, depth };
 }
 
 
@@ -115,5 +225,5 @@ const sortedArrayToBTS = (arr) => {
 
  
 const tree = Tree([5,21,3,1,99,99,2,10,11,12,45,13,86,91,123]);
-tree.deleteItem(12);
+console.log(tree.height(tree.root));
 
