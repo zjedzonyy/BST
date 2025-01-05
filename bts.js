@@ -29,7 +29,6 @@ const Tree = (array) => {
         };
 
         root = insertNode(root, value);
-        prettyPrint(root);
 
     };
 
@@ -173,14 +172,55 @@ const Tree = (array) => {
         return 1 + Math.max(height(node.left), height(node.right));
     };
 
-    const depth = (node) => {
-        const height = height(root);
-        const heightNode = height(node);
+    // Idzie maksymalnie w dół w obu kierunkach (lewo i prawo).
+    // Jeśli węzeł zostanie znaleziony, rekurencja "wraca w górę", sumując kolejne +1, aż do korzenia.
+    // Jeśli węzeł nie zostanie znaleziony w żadnym poddrzewie, funkcja zwraca -1.
 
-        const result = height - heightNode;
-        return result;
-       
- 
+    const depth = (node, current = root) => {
+        // Go back if doesn't exists
+        if (current === null) {
+            return -1;
+        }
+        if (current === node) {
+            return 0;
+        }
+        
+        let leftDepth = depth(node, current.left);
+        let rightDepth = depth(node, current.right);
+
+        if (leftDepth !== -1) {
+            return 1 + leftDepth;
+        }
+        if (rightDepth !== -1) {
+            return 1 + rightDepth;
+        }
+
+        return -1;
+
+    };
+
+    const isBalanced = (node = root) => {
+       if (node === null) return true;
+
+       const leftHeight = height(node.left);
+       const rightHeight = height(node.right);
+
+       if (Math.abs(leftHeight - rightHeight) > 1) {
+        return false;
+       }
+
+       return isBalanced(node.left) && isBalanced(node.right);
+
+    };
+
+    const rebalance = () => {
+        if (isBalanced() === true) {
+            throw new Error ("The tree is already balanced");
+        }
+
+        let newArray = [];
+        inOrder((node) => newArray.push(node.data));
+        root = sortedArrayToBTS(newArray);
     }
 
     const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -198,7 +238,7 @@ const Tree = (array) => {
 
     prettyPrint(root);
 
-    return { arr, root, insert, deleteItem, find, levelOrder, inOrder, preOrder, postOrder, height, depth };
+    return { arr, root, insert, deleteItem, find, levelOrder, inOrder, preOrder, postOrder, height, depth, isBalanced, rebalance };
 }
 
 
@@ -223,7 +263,36 @@ const sortedArrayToBTS = (arr) => {
     return buildTree(arr, 0, arr.length - 1);
 }
 
- 
-const tree = Tree([5,21,3,1,99,99,2,10,11,12,45,13,86,91,123]);
-console.log(tree.height(tree.root));
 
+
+// D R I V E R    S C R I P T
+function driver() {
+    let testArray = [];
+    while (testArray.length < 8) {
+        testArray.push(Math.floor(Math.random() * (99 - 0) + 0));
+    }
+    
+    const bst = Tree(testArray);
+    console.log(bst.isBalanced())
+    console.log("PreOrder")
+    bst.preOrder((node) => console.log(node.data))
+    console.log("InOrder")
+    bst.inOrder((node) => console.log(node.data))
+    console.log("PostOrder")
+    bst.postOrder((node) => console.log(node.data))
+    bst.insert(100)
+    bst.insert(101)
+    bst.insert(102)
+    bst.insert(103)
+    console.log(bst.isBalanced())
+    bst.rebalance();
+    console.log(bst.isBalanced())
+    console.log("PreOrder")
+    bst.preOrder((node) => console.log(node.data))
+    console.log("InOrder")
+    bst.inOrder((node) => console.log(node.data))
+    console.log("PostOrder")
+    bst.postOrder((node) => console.log(node.data))
+}
+
+driver()
